@@ -46,7 +46,7 @@ logoutBtn.addEventListener("click", () => {
 });
 
 // 2. INDEXEDDB YÖNETİMİ
-const DB_NAME = "PuantajPortalDB_v4";
+const DB_NAME = "PuantajPortalDB_v5";
 const STORE_NAME = "workbooks";
 const DB_VERSION = 1;
 
