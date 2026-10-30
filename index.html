@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DS Smith - Sardunya Puantaj Yönetim Portalı</title>
+  <title>DS Smith - Yemek & Servis Puantaj Yönetim Portalı</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -30,7 +30,7 @@
           <i data-lucide="shield-check" class="w-8 h-8"></i>
         </div>
         <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Puantaj Portalı</h1>
-        <p class="text-sm text-slate-500 mt-1">DS Smith & Sardunya Yemek Sayıları Sistemi</p>
+        <p class="text-sm text-slate-500 mt-1">DS Smith Yemek &amp; Servis Puantaj Yönetim Sistemi</p>
       </div>
 
       <form id="loginForm" class="space-y-4">
@@ -74,19 +74,33 @@
   <div id="dashboardSection" class="hidden min-h-screen flex flex-col">
     <!-- Üst Menü -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
             DS
           </div>
           <div>
-            <h1 class="text-base font-bold text-slate-900 leading-tight">DS Smith & Sardunya Puantaj</h1>
-            <p class="text-xs text-slate-500">son.xlsx Otomatik Veri Güncelleme Merkezi</p>
+            <h1 class="text-base font-bold text-slate-900 leading-tight">DS Smith Puantaj Merkezi</h1>
+            <p class="text-xs text-slate-500">Yemek &amp; Servis Otomatik Birleştirme Sistemi</p>
           </div>
         </div>
 
+        <!-- Modül Seçici Sekmeler (Yemek / Servis) -->
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <button type="button" id="tabYemekBtn"
+            class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2 bg-blue-600 text-white shadow-sm">
+            <i data-lucide="utensils" class="w-4 h-4"></i>
+            <span>Yemek Puantaj</span>
+          </button>
+          <button type="button" id="tabServisBtn"
+            class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+            <i data-lucide="bus" class="w-4 h-4"></i>
+            <span>Servis Puantaj</span>
+          </button>
+        </div>
+
         <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2 bg-slate-100 py-1.5 px-3 rounded-full text-xs font-medium text-slate-700">
+          <div class="hidden sm:flex items-center gap-2 bg-slate-100 py-1.5 px-3 rounded-full text-xs font-medium text-slate-700">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span>Kullanıcı: <strong>hüseyin</strong></span>
           </div>
@@ -97,20 +111,20 @@
       </div>
     </header>
 
-    <!-- Ana İçerik -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <!-- ==================== 1. YEMEK PUANTAJ BÖLÜMÜ ==================== -->
+    <main id="yemekPanel" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-      <!-- Hızlı Eylem & İndirme Kartı -->
+      <!-- Hızlı Eylem & İndirme Kartı (Yemek) -->
       <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="space-y-2 max-w-xl">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-200 border border-blue-400/20">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-              Otomatik Excel Birleştirici Aktif
+              <i data-lucide="utensils" class="w-3.5 h-3.5"></i>
+              Yemek Sayıları Birleştirici Aktif
             </span>
-            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Güncel Puantaj Dosyası: son.xlsx</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Yemek Puantaj Dosyası: son.xlsx</h2>
             <p class="text-slate-300 text-sm">
-              Tüm aylar (Ocak – Ekim) tek bir dosyada birleştirildi. Yeni gelen mail Excel'ini yüklediğinizde eksik günler otomatik tamamlanır.
+              Sardunya yemek puantajları (Ocak – Ekim) tek dosyada birleştirildi. Yeni gelen yemek Excel'ini yüklediğinizde eksik günler otomatik tamamlanır.
             </p>
           </div>
 
@@ -118,7 +132,7 @@
             <button id="downloadBtn"
               class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/30 transition flex items-center justify-center gap-2.5">
               <i data-lucide="download" class="w-5 h-5"></i>
-              <span>Güncel Dosyayı İndir (son.xlsx)</span>
+              <span>Yemek Dosyasını İndir (son.xlsx)</span>
             </button>
             <button id="resetBtn"
               class="px-4 py-3.5 bg-white/10 hover:bg-white/20 active:bg-white/30 text-slate-200 font-medium rounded-2xl border border-white/10 transition flex items-center justify-center gap-2 text-sm"
@@ -130,16 +144,14 @@
         </div>
       </div>
 
-      <!-- İki Kolon: Dosya Yükleme ve Durum Özeti -->
+      <!-- İki Kolon: Yemek Dosya Yükleme ve Durum Özeti -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        <!-- Sol: Dosya Yükleme Alanı (5 Kolon) -->
         <div class="lg:col-span-5 space-y-6">
           <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
               <h3 class="font-bold text-slate-900 flex items-center gap-2">
                 <i data-lucide="upload-cloud" class="w-5 h-5 text-blue-600"></i>
-                Yeni Mail Dosyası Yükle
+                Yeni Yemek Dosyası Yükle
               </h3>
               <span class="text-xs bg-blue-50 text-blue-700 font-medium px-2 py-0.5 rounded-full">Otomatik Eşleme</span>
             </div>
@@ -148,44 +160,40 @@
               DS Smith veya Türker Topçu'dan gelen haftalık / aylık yemek sayıları Excel dosyasını (.xlsx) buraya bırakın. Tarihler otomatik tespit edilip ilgili aya yazılır.
             </p>
 
-            <!-- Drop Zone -->
             <div id="dropZone"
               class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-8 text-center cursor-pointer transition bg-slate-50/50 hover:bg-blue-50/30 flex flex-col items-center justify-center">
               <input type="file" id="fileInput" accept=".xlsx, .xls" class="hidden">
               <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center text-blue-600 mb-3">
                 <i data-lucide="file-spreadsheet" class="w-7 h-7"></i>
               </div>
-              <p class="text-sm font-semibold text-slate-700">Excel Dosyasını Buraya Sürükleyin</p>
+              <p class="text-sm font-semibold text-slate-700">Yemek Excel Dosyasını Buraya Sürükleyin</p>
               <p class="text-xs text-slate-400 mt-1">veya bilgisayarınızdan seçmek için tıklayın</p>
             </div>
 
-            <!-- İşlem Durumu & Log Bildirimi -->
             <div id="processStatus" class="hidden p-4 rounded-xl border text-sm"></div>
           </div>
 
-          <!-- Bilgilendirme Kutusu -->
           <div class="bg-blue-50/80 rounded-2xl p-5 border border-blue-200/60 text-xs text-blue-900 space-y-2">
             <div class="font-bold flex items-center gap-1.5 text-blue-800">
               <i data-lucide="info" class="w-4 h-4"></i>
-              Nasıl Çalışır?
+              Yemek Puantaj Nasıl Çalışır?
             </div>
             <ul class="list-disc list-inside space-y-1 text-blue-800/80">
               <li>Yüklediğiniz Excel'deki <strong>tarihler gün gün taranır</strong>.</li>
-              <li>`son.xlsx` dosyasındaki ilgili aya ait satırlar bulunur.</li>
+              <li><code>son.xlsx</code> dosyasındaki ilgili aya ait satırlar bulunur.</li>
               <li>Öğlen, Gece, Kumanya, Yoğurt, Ayran, Cacık ve Açma/Sandviç adetleri doldurulur.</li>
               <li>Tüm formüller ve toplam tutarlar anında otomatik güncellenir.</li>
             </ul>
           </div>
         </div>
 
-        <!-- Sağ: Aylık Doluluk ve Eksik Veri Durumu (7 Kolon) -->
         <div class="lg:col-span-7 space-y-6">
           <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="font-bold text-slate-900 flex items-center gap-2">
                   <i data-lucide="calendar" class="w-5 h-5 text-indigo-600"></i>
-                  Aylık Veri Durumu (Ocak - Ekim)
+                  Yemek Aylık Veri Durumu (Ocak - Ekim)
                 </h3>
                 <p class="text-xs text-slate-500 mt-0.5">Eksik kalan günleri buradan takip edebilirsiniz</p>
               </div>
@@ -194,26 +202,119 @@
               </span>
             </div>
 
-            <!-- Aylar Listesi -->
-            <div id="monthsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-              <!-- JS ile dinamik doldurulacak -->
+            <div id="monthsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== 2. SERVİS PUANTAJ BÖLÜMÜ ==================== -->
+    <main id="servisPanel" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+      <!-- Hızlı Eylem & İndirme Kartı (Servis) -->
+      <div class="bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-2 max-w-xl">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-200 border border-emerald-400/20">
+              <i data-lucide="bus" class="w-3.5 h-3.5"></i>
+              Personel Servis Puantaj Birleştirici Aktif
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Servis Puantaj Dosyası: son.xlsx</h2>
+            <p class="text-slate-300 text-sm">
+              Tüm aylar (Ocak – Aralık) renkli grup tasarımıyla, ücretsiz (sadece sefer sayıları ve toplamlar) olarak tek bir Excel'de birleştirildi.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 shrink-0">
+            <button id="servisDownloadBtn"
+              class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/30 transition flex items-center justify-center gap-2.5">
+              <i data-lucide="download" class="w-5 h-5"></i>
+              <span>Servis Dosyasını İndir (son.xlsx)</span>
+            </button>
+            <button id="servisResetBtn"
+              class="px-4 py-3.5 bg-white/10 hover:bg-white/20 active:bg-white/30 text-slate-200 font-medium rounded-2xl border border-white/10 transition flex items-center justify-center gap-2 text-sm"
+              title="Servis puantajını ilk haline döndür">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              <span>Sıfırla</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- İki Kolon: Servis Dosya Yükleme ve Durum Özeti -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-5 space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="upload-cloud" class="w-5 h-5 text-emerald-600"></i>
+                Yeni Servis Puantaj Dosyası Yükle
+              </h3>
+              <span class="text-xs bg-emerald-50 text-emerald-700 font-medium px-2 py-0.5 rounded-full">Güzergah Eşleme</span>
             </div>
+
+            <p class="text-xs text-slate-500 leading-relaxed">
+              DS Smith'ten gelen aylık / haftalık servis puantaj Excel dosyasını (.xlsx) buraya bırakın. Güzergahlar (Memur, Üretim, Vardiya, Sabah, Ek, Mesai) otomatik eşleştirilip ilgili aya işlenir.
+            </p>
+
+            <div id="servisDropZone"
+              class="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl p-8 text-center cursor-pointer transition bg-slate-50/50 hover:bg-emerald-50/30 flex flex-col items-center justify-center">
+              <input type="file" id="servisFileInput" accept=".xlsx, .xls" class="hidden">
+              <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center text-emerald-600 mb-3">
+                <i data-lucide="bus" class="w-7 h-7"></i>
+              </div>
+              <p class="text-sm font-semibold text-slate-700">Servis Excel Dosyasını Buraya Sürükleyin</p>
+              <p class="text-xs text-slate-400 mt-1">veya bilgisayarınızdan seçmek için tıklayın</p>
+            </div>
+
+            <div id="servisProcessStatus" class="hidden p-4 rounded-xl border text-sm"></div>
+          </div>
+
+          <div class="bg-emerald-50/80 rounded-2xl p-5 border border-emerald-200/60 text-xs text-emerald-900 space-y-2">
+            <div class="font-bold flex items-center gap-1.5 text-emerald-800">
+              <i data-lucide="palette" class="w-4 h-4"></i>
+              Servis Puantaj Özellikleri
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-emerald-800/80">
+              <li><strong>Ocak – Aralık (12 Ay)</strong> ayrı sekmeler halinde tek Excel'de yer alır.</li>
+              <li><strong>Ücret/Fiyat sütunları kaldırılmıştır;</strong> yalnızca günlük sefer sayıları ve toplamlar bulunur.</li>
+              <li>Okunabilirlik için <strong>Memur (Mavi), Üretim (Yeşil), Vardiya (Sarı), Sabah (Gri), Ek (Pembe), Mesai (Lila)</strong> grupları renklendirilmiştir.</li>
+              <li>Hafta sonu günleri gri sütun ve kırmızı rakamlarla otomatik vurgulanır.</li>
+            </ul>
           </div>
         </div>
 
-      </div>
+        <div class="lg:col-span-7 space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                  <i data-lucide="calendar" class="w-5 h-5 text-emerald-600"></i>
+                  Servis Aylık Veri Durumu (Ocak - Aralık)
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">Aylık servis sefer sayılarını ve eksik ayları buradan takip edebilirsiniz</p>
+              </div>
+              <span id="servisOverallBadge" class="text-xs px-2.5 py-1 rounded-full font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                Kontrol ediliyor...
+              </span>
+            </div>
 
+            <div id="servisMonthsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2"></div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <!-- Alt Bilgi -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
-      DS Smith Ambalaj & Sardunya Catering Puantaj Entegrasyon Sistemi · <strong>Sürüm 6</strong>
+      DS Smith Ambalaj Yemek &amp; Servis Puantaj Entegrasyon Sistemi · <strong>Sürüm 7</strong>
     </footer>
   </div>
 
-  <!-- Base Excel verisi (base64) -->
-  <script src="base_excel.js?v=6"></script>
+  <!-- Base Excel verileri (base64) -->
+  <script src="base_excel.js?v=7"></script>
+  <script src="base_servis_excel.js?v=7"></script>
   <!-- Uygulama Mantığı -->
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>
