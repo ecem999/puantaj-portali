@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>DS Smith - Yemek & Servis Puantaj Yönetim Portalı</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -75,7 +78,7 @@
     <!-- Üst Menü -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 cursor-pointer" id="brandHomeBtn" title="Seçim Ekranına Dön">
           <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
             DS
           </div>
@@ -86,14 +89,14 @@
         </div>
 
         <!-- Modül Seçici Sekmeler (Yemek / Servis) -->
-        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 gap-1">
           <button type="button" id="tabYemekBtn"
-            class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2 bg-blue-600 text-white shadow-sm">
+            class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
             <i data-lucide="utensils" class="w-4 h-4"></i>
             <span>Yemek Puantaj</span>
           </button>
           <button type="button" id="tabServisBtn"
-            class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
+            class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-600 hover:text-slate-900">
             <i data-lucide="bus" class="w-4 h-4"></i>
             <span>Servis Puantaj</span>
           </button>
@@ -111,8 +114,68 @@
       </div>
     </header>
 
+    <!-- ==================== 0. BAŞLANGIÇ SEÇİM EKRANI (YEMEK VEYA SERVİS) ==================== -->
+    <section id="chooserPanel" class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col justify-center">
+      <div class="text-center mb-10 space-y-2">
+        <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+          <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+          DS Smith 2026 Puantaj Yönetim Sistemi
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Hangi Puantaj Tablosuyla Çalışmak İstiyorsunuz?</h2>
+        <p class="text-sm text-slate-500 max-w-xl mx-auto">
+          İşlem yapmak istediğiniz puantaj bölümünü seçin. Yeni gelen Excel dosyalarını yükleyip güncel <code>son.xlsx</code> dosyasını indirebilirsiniz.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- YEMEK BUTONU / KARTI -->
+        <button type="button" id="chooseYemekCard"
+          class="group text-left bg-white hover:bg-blue-50/40 rounded-3xl p-8 border-2 border-slate-200 hover:border-blue-600 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col justify-between gap-6">
+          <div class="space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-600/30 group-hover:scale-105 transition">
+              <i data-lucide="utensils" class="w-8 h-8"></i>
+            </div>
+            <div>
+              <h3 class="text-2xl font-extrabold text-slate-900 group-hover:text-blue-600 transition">Yemek Puantaj</h3>
+              <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                Sardunya günlük yemek, kahvaltı, yoğurt, ayran, cacık, açma/poğaça ve mesai-iftar puantajları (Ocak – Ekim 2026).
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Yemek son.xlsx Yönetimi</span>
+            <span class="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition">
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </span>
+          </div>
+        </button>
+
+        <!-- SERVİS BUTONU / KARTI -->
+        <button type="button" id="chooseServisCard"
+          class="group text-left bg-white hover:bg-emerald-50/40 rounded-3xl p-8 border-2 border-slate-200 hover:border-emerald-600 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col justify-between gap-6">
+          <div class="space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 group-hover:scale-105 transition">
+              <i data-lucide="bus" class="w-8 h-8"></i>
+            </div>
+            <div>
+              <h3 class="text-2xl font-extrabold text-slate-900 group-hover:text-emerald-600 transition">Servis Puantaj</h3>
+              <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                Personel servis güzergahları (Memur, Üretim, Vardiya, Sabah, Ek, Mesai ve Özmal) renkli sefer puantajları (Ocak – Aralık 2026).
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+            <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Servis son.xlsx Yönetimi</span>
+            <span class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition">
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </span>
+          </div>
+        </button>
+      </div>
+    </section>
+
     <!-- ==================== 1. YEMEK PUANTAJ BÖLÜMÜ ==================== -->
-    <main id="yemekPanel" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <main id="yemekPanel" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
       <!-- Hızlı Eylem & İndirme Kartı (Yemek) -->
       <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
@@ -307,14 +370,14 @@
 
     <!-- Alt Bilgi -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
-      DS Smith Ambalaj Yemek &amp; Servis Puantaj Entegrasyon Sistemi · <strong>Sürüm 7</strong>
+      DS Smith Ambalaj Yemek &amp; Servis Puantaj Entegrasyon Sistemi · <strong>Sürüm 8</strong>
     </footer>
   </div>
 
   <!-- Base Excel verileri (base64) -->
-  <script src="base_excel.js?v=7"></script>
-  <script src="base_servis_excel.js?v=7"></script>
+  <script src="base_excel.js?v=8"></script>
+  <script src="base_servis_excel.js?v=8"></script>
   <!-- Uygulama Mantığı -->
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>

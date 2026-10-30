@@ -45,23 +45,35 @@ logoutBtn.addEventListener("click", () => {
   checkAuth();
 });
 
-// SEKME (TAB) GEÇİŞLERİ: YEMEK PUANTAJ <-> SERVİS PUANTAJ
+// SEKME (TAB) GEÇİŞLERİ VE BAŞLANGIÇ SEÇİM EKRANI: YEMEK PUANTAJ <-> SERVİS PUANTAJ
 const tabYemekBtn = document.getElementById("tabYemekBtn");
 const tabServisBtn = document.getElementById("tabServisBtn");
+const chooseYemekCard = document.getElementById("chooseYemekCard");
+const chooseServisCard = document.getElementById("chooseServisCard");
+const brandHomeBtn = document.getElementById("brandHomeBtn");
+const chooserPanel = document.getElementById("chooserPanel");
 const yemekPanel = document.getElementById("yemekPanel");
 const servisPanel = document.getElementById("servisPanel");
 
 function switchTab(mode) {
-  if (mode === "servis") {
+  if (mode === "chooser") {
+    if (chooserPanel) chooserPanel.classList.remove("hidden");
+    yemekPanel.classList.add("hidden");
+    servisPanel.classList.add("hidden");
+    tabYemekBtn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+    tabServisBtn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
+  } else if (mode === "servis") {
+    if (chooserPanel) chooserPanel.classList.add("hidden");
     yemekPanel.classList.add("hidden");
     servisPanel.classList.remove("hidden");
-    tabServisBtn.className = "flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition bg-white text-indigo-600 shadow-sm";
-    tabYemekBtn.className = "flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900";
+    tabServisBtn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-emerald-600 text-white shadow-sm";
+    tabYemekBtn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
   } else {
+    if (chooserPanel) chooserPanel.classList.add("hidden");
     servisPanel.classList.add("hidden");
     yemekPanel.classList.remove("hidden");
-    tabYemekBtn.className = "flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition bg-white text-blue-600 shadow-sm";
-    tabServisBtn.className = "flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900";
+    tabYemekBtn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-blue-600 text-white shadow-sm";
+    tabServisBtn.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center gap-2 text-slate-600 hover:text-slate-900";
   }
   if (window.lucide) lucide.createIcons();
 }
@@ -69,6 +81,15 @@ function switchTab(mode) {
 if (tabYemekBtn && tabServisBtn) {
   tabYemekBtn.addEventListener("click", () => switchTab("yemek"));
   tabServisBtn.addEventListener("click", () => switchTab("servis"));
+}
+if (chooseYemekCard) {
+  chooseYemekCard.addEventListener("click", () => switchTab("yemek"));
+}
+if (chooseServisCard) {
+  chooseServisCard.addEventListener("click", () => switchTab("servis"));
+}
+if (brandHomeBtn) {
+  brandHomeBtn.addEventListener("click", () => switchTab("chooser"));
 }
 
 // 2. INDEXEDDB YÖNETİMİ
