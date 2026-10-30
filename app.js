@@ -46,7 +46,7 @@ logoutBtn.addEventListener("click", () => {
 });
 
 // 2. INDEXEDDB YÖNETİMİ
-const DB_NAME = "PuantajPortalDB_v3";
+const DB_NAME = "PuantajPortalDB_v4";
 const STORE_NAME = "workbooks";
 const DB_VERSION = 1;
 
@@ -159,8 +159,106 @@ let currentWorkbook = null;
 
 const MONTH_NAMES = [
   "ocak", "şubat", "mart", "nisan", "mayıs", "haziran",
-  "temmuz", "ağustos", "eylül", "ekim", "kasım", "aralık"
+  "temmuz", "ağustos", "eylül", "ekim"
 ];
+
+function colLettersToIndex(letters) {
+  let col = 0;
+  for (let i = 0; i < letters.length; i++) {
+    col = col * 26 + (letters.charCodeAt(i) - 64);
+  }
+  return col;
+}
+
+function indexToColLetters(col) {
+  let temp, letter = "";
+  while (col > 0) {
+    temp = (col - 1) % 26;
+    letter = String.fromCharCode(temp + 65) + letter;
+    col = (col - temp - 1) / 26;
+  }
+  return letter;
+}
+
+function parseCellCoord(coord) {
+  const m = /^([A-Z]+)(\d+)$/i.exec(coord.trim());
+  if (!m) return null;
+  return { col: colLettersToIndex(m[1].toUpperCase()), row: parseInt(m[2], 10) };
+}
+
+// Tüm formüllerin önbellek (cached result) değerlerini hesaplar.
+// Böylece Excel Korumalı Görünümde açılsa bile toplamlar boş görünmez.
+function recalculateWorkbookFormulas(wb) {
+  if (!wb) return;
+  wb.calcProperties = wb.calcProperties || {};
+  wb.calcProperties.fullCalcOnLoad = true;
+
+  wb.worksheets.forEach((ws) => {
+    const vals = {};
+    const formulas = {};
+
+    ws.eachRow({ includeEmpty: false }, (row, rNum) => {
+      row.eachCell({ includeEmpty: false }, (cell, cNum) => {
+        const coord = `${indexToColLetters(cNum)}${rNum}`;
+        const v = cell.value;
+        if (v && typeof v === "object" && typeof v.formula === "string") {
+          const fStr = v.formula.replace(/^=/, "").trim();
+          formulas[coord] = { cell, formula: fStr };
+          vals[coord] = typeof v.result === "number" ? v.result : 0;
+        } else if (typeof v === "string" && v.startsWith("=")) {
+          const fStr = v.replace(/^=/, "").trim();
+          formulas[coord] = { cell, formula: fStr };
+          vals[coord] = 0;
+        } else if (typeof v === "number") {
+          vals[coord] = v;
+        }
+      });
+    });
+
+    const getVal = (c) => vals[c.trim().toUpperCase()] || 0;
+
+    const evalExpr = (expr) => {
+      const s = expr.trim();
+      const mSum = /^SUM\(([A-Z]+\d+):([A-Z]+\d+)\)$/i.exec(s);
+      if (mSum) {
+        const p1 = parseCellCoord(mSum[1]);
+        const p2 = parseCellCoord(mSum[2]);
+        if (!p1 || !p2) return 0;
+        let sum = 0;
+        for (let r = Math.min(p1.row, p2.row); r <= Math.max(p1.row, p2.row); r++) {
+          for (let c = Math.min(p1.col, p2.col); c <= Math.max(p1.col, p2.col); c++) {
+            sum += getVal(`${indexToColLetters(c)}${r}`);
+          }
+        }
+        return Math.round(sum * 100) / 100;
+      }
+      if (s.includes("*")) {
+        const parts = s.split("*");
+        let prod = 1;
+        for (const p of parts) prod *= getVal(p);
+        return Math.round(prod * 100) / 100;
+      }
+      if (s.includes("-") && !s.includes("+")) {
+        const parts = s.split("-");
+        return Math.round((getVal(parts[0]) - getVal(parts[1])) * 100) / 100;
+      }
+      const parts = s.split("+");
+      let sum = 0;
+      for (const p of parts) sum += getVal(p);
+      return Math.round(sum * 100) / 100;
+    };
+
+    for (let pass = 0; pass < 6; pass++) {
+      for (const [coord, info] of Object.entries(formulas)) {
+        vals[coord] = evalExpr(info.formula);
+      }
+    }
+
+    for (const [coord, info] of Object.entries(formulas)) {
+      info.cell.value = { formula: info.formula, result: vals[coord] };
+    }
+  });
+}
 
 function normStr(str) {
   if (!str) return "";
@@ -345,6 +443,7 @@ async function clearMonthData(monthIdx) {
     }
   });
 
+  recalculateWorkbookFormulas(currentWorkbook);
   const updatedBuffer = await currentWorkbook.xlsx.writeBuffer();
   await saveWorkbookBuffer(updatedBuffer);
   refreshMonthDashboard();
@@ -489,6 +588,7 @@ async function handleFileUpload(file) {
     });
 
     if (updatedDaysCount > 0) {
+      recalculateWorkbookFormulas(currentWorkbook);
       const updatedBuffer = await currentWorkbook.xlsx.writeBuffer();
       await saveWorkbookBuffer(updatedBuffer);
 
@@ -527,6 +627,7 @@ downloadBtn.addEventListener("click", async () => {
   }
 
   try {
+    recalculateWorkbookFormulas(currentWorkbook);
     const buffer = await currentWorkbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     const url = URL.createObjectURL(blob);
