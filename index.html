@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DS Smith - Sardunya Puantaj Yönetim Portalı</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- ExcelJS -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .drop-zone-active { border-color: #3b82f6 !important; background-color: #eff6ff !important; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+  <!-- ==================== GİRİŞ EKRANI (LOGIN) ==================== -->
+  <div id="loginSection" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80 w-full max-w-md p-8 relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500"></div>
+      
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-blue-100">
+          <i data-lucide="shield-check" class="w-8 h-8"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Puantaj Portalı</h1>
+        <p class="text-sm text-slate-500 mt-1">DS Smith & Sardunya Yemek Sayıları Sistemi</p>
+      </div>
+
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Kullanıcı Adı</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <i data-lucide="user" class="w-5 h-5"></i>
+            </span>
+            <input type="text" id="usernameInput" required placeholder="Kullanıcı adınızı girin"
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Şifre</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <i data-lucide="lock" class="w-5 h-5"></i>
+            </span>
+            <input type="password" id="passwordInput" required placeholder="Şifrenizi girin"
+              class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition">
+          </div>
+        </div>
+
+        <div id="loginError" class="hidden text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-lg p-2.5 flex items-center gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+          <span>Kullanıcı adı veya şifre hatalı!</span>
+        </div>
+
+        <button type="submit"
+          class="w-full py-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-xl shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-2">
+          <span>Giriş Yap</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== ANA DASHBOARD (UYGULAMA) ==================== -->
+  <div id="dashboardSection" class="hidden min-h-screen flex flex-col">
+    <!-- Üst Menü -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            DS
+          </div>
+          <div>
+            <h1 class="text-base font-bold text-slate-900 leading-tight">DS Smith & Sardunya Puantaj</h1>
+            <p class="text-xs text-slate-500">son.xlsx Otomatik Veri Güncelleme Merkezi</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 bg-slate-100 py-1.5 px-3 rounded-full text-xs font-medium text-slate-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Kullanıcı: <strong>hüseyin</strong></span>
+          </div>
+          <button id="logoutBtn" class="text-slate-500 hover:text-slate-800 p-2 rounded-lg hover:bg-slate-100 transition" title="Çıkış Yap">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Ana İçerik -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+      <!-- Hızlı Eylem & İndirme Kartı -->
+      <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-2 max-w-xl">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-200 border border-blue-400/20">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              Otomatik Excel Birleştirici Aktif
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Güncel Puantaj Dosyası: son.xlsx</h2>
+            <p class="text-slate-300 text-sm">
+              Tüm aylar (Ocak – Ekim) tek bir dosyada birleştirildi. Yeni gelen mail Excel'ini yüklediğinizde eksik günler otomatik tamamlanır.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 shrink-0">
+            <button id="downloadBtn"
+              class="px-6 py-3.5 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/30 transition flex items-center justify-center gap-2.5">
+              <i data-lucide="download" class="w-5 h-5"></i>
+              <span>Güncel Dosyayı İndir (son.xlsx)</span>
+            </button>
+            <button id="resetBtn"
+              class="px-4 py-3.5 bg-white/10 hover:bg-white/20 active:bg-white/30 text-slate-200 font-medium rounded-2xl border border-white/10 transition flex items-center justify-center gap-2 text-sm"
+              title="İlk haline geri döndür">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              <span>Sıfırla</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- İki Kolon: Dosya Yükleme ve Durum Özeti -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Sol: Dosya Yükleme Alanı (5 Kolon) -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="upload-cloud" class="w-5 h-5 text-blue-600"></i>
+                Yeni Mail Dosyası Yükle
+              </h3>
+              <span class="text-xs bg-blue-50 text-blue-700 font-medium px-2 py-0.5 rounded-full">Otomatik Eşleme</span>
+            </div>
+
+            <p class="text-xs text-slate-500 leading-relaxed">
+              DS Smith veya Türker Topçu'dan gelen haftalık / aylık yemek sayıları Excel dosyasını (.xlsx) buraya bırakın. Tarihler otomatik tespit edilip ilgili aya yazılır.
+            </p>
+
+            <!-- Drop Zone -->
+            <div id="dropZone"
+              class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-8 text-center cursor-pointer transition bg-slate-50/50 hover:bg-blue-50/30 flex flex-col items-center justify-center">
+              <input type="file" id="fileInput" accept=".xlsx, .xls" class="hidden">
+              <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-slate-200 flex items-center justify-center text-blue-600 mb-3">
+                <i data-lucide="file-spreadsheet" class="w-7 h-7"></i>
+              </div>
+              <p class="text-sm font-semibold text-slate-700">Excel Dosyasını Buraya Sürükleyin</p>
+              <p class="text-xs text-slate-400 mt-1">veya bilgisayarınızdan seçmek için tıklayın</p>
+            </div>
+
+            <!-- İşlem Durumu & Log Bildirimi -->
+            <div id="processStatus" class="hidden p-4 rounded-xl border text-sm"></div>
+          </div>
+
+          <!-- Bilgilendirme Kutusu -->
+          <div class="bg-blue-50/80 rounded-2xl p-5 border border-blue-200/60 text-xs text-blue-900 space-y-2">
+            <div class="font-bold flex items-center gap-1.5 text-blue-800">
+              <i data-lucide="info" class="w-4 h-4"></i>
+              Nasıl Çalışır?
+            </div>
+            <ul class="list-disc list-inside space-y-1 text-blue-800/80">
+              <li>Yüklediğiniz Excel'deki <strong>tarihler gün gün taranır</strong>.</li>
+              <li>`son.xlsx` dosyasındaki ilgili aya ait satırlar bulunur.</li>
+              <li>Öğlen, Gece, Kumanya, Yoğurt, Ayran, Cacık ve Açma/Sandviç adetleri doldurulur.</li>
+              <li>Tüm formüller ve toplam tutarlar anında otomatik güncellenir.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Sağ: Aylık Doluluk ve Eksik Veri Durumu (7 Kolon) -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                  <i data-lucide="calendar" class="w-5 h-5 text-indigo-600"></i>
+                  Aylık Veri Durumu (Ocak - Ekim)
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">Eksik kalan günleri buradan takip edebilirsiniz</p>
+              </div>
+              <span id="overallBadge" class="text-xs px-2.5 py-1 rounded-full font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                Kontrol ediliyor...
+              </span>
+            </div>
+
+            <!-- Aylar Listesi -->
+            <div id="monthsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <!-- JS ile dinamik doldurulacak -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Alt Bilgi -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+      DS Smith Ambalaj & Sardunya Catering Puantaj Entegrasyon Sistemi
+    </footer>
+  </div>
+
+  <!-- Base Excel verisi (base64) -->
+  <script src="base_excel.js"></script>
+  <!-- Uygulama Mantığı -->
+  <script src="app.js"></script>
+</body>
+</html>
