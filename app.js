@@ -148,8 +148,8 @@ function parseDateSmart(val) {
         return new Date(y, m, d);
       }
     }
-    const standard = new Date(s);
-    if (!isNaN(standard.getTime())) return standard;
+    // Not: new Date(s) gibi gevşek ayrıştırma kullanılmıyor; "…ARALIK 2026" gibi
+    // başlık satırlarını yanlışlıkla tarih sanıyordu.
   }
   return null;
 }
@@ -195,7 +195,19 @@ async function initApp() {
     }
 
     currentWorkbook = new ExcelJS.Workbook();
-    await currentWorkbook.xlsx.load(buf);
+    try {
+      await currentWorkbook.xlsx.load(buf);
+    } catch (e) {
+      // Kayıtlı veri okunamıyorsa temiz şablona dön
+      console.warn("Kayıtlı çalışma kitabı okunamadı, şablona dönülüyor:", e);
+      buf = base64ToUint8Array(DEFAULT_SON_EXCEL_B64).buffer;
+      await saveWorkbookBuffer(buf);
+      currentWorkbook = new ExcelJS.Workbook();
+      await currentWorkbook.xlsx.load(buf);
+    }
+    if (currentWorkbook.worksheets.length === 0) {
+      throw new Error("Şablonda hiç sayfa bulunamadı.");
+    }
     refreshMonthDashboard();
   } catch (err) {
     console.error("Excel yükleme hatası:", err);
@@ -451,8 +463,9 @@ async function handleFileUpload(file) {
 // 6. GÜNCEL son.xlsx İNDİRME
 const downloadBtn = document.getElementById("downloadBtn");
 downloadBtn.addEventListener("click", async () => {
-  if (!currentWorkbook) {
-    Swal.fire({ icon: "error", title: "Hata", text: "İndirilecek Excel verisi bulunamadı." });
+  if (!currentWorkbook || currentWorkbook.worksheets.length === 0) {
+    // Sayfasız bir çalışma kitabı Excel'de "dosya bozuk" hatası verir; asla indirme.
+    Swal.fire({ icon: "error", title: "Hata", text: "Puantaj tablosu yüklenemedi; indirilecek geçerli veri yok. Sayfayı Ctrl+F5 ile yenileyin." });
     return;
   }
 
