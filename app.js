@@ -46,7 +46,7 @@ logoutBtn.addEventListener("click", () => {
 });
 
 // 2. INDEXEDDB YÖNETİMİ
-const DB_NAME = "PuantajPortalDB_v2";
+const DB_NAME = "PuantajPortalDB_v3";
 const STORE_NAME = "workbooks";
 const DB_VERSION = 1;
 
@@ -271,10 +271,10 @@ function refreshMonthDashboard() {
     }
 
     const card = document.createElement("div");
-    card.className = "p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex items-center justify-between";
+    card.className = "p-4 rounded-xl border border-slate-200 bg-white shadow-sm flex items-center justify-between gap-2";
     card.innerHTML = `
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg ${isComplete ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'} flex items-center justify-center">
+        <div class="w-10 h-10 rounded-lg ${isComplete ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'} flex items-center justify-center shrink-0">
           <i data-lucide="${iconName}" class="w-5 h-5"></i>
         </div>
         <div>
@@ -282,10 +282,22 @@ function refreshMonthDashboard() {
           <p class="text-xs text-slate-500">${filledDays} / ${totalDays} gün dolu</p>
         </div>
       </div>
-      <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${badgeClass}">
-        ${statusText}
-      </span>
+      <div class="flex items-center gap-1.5">
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${badgeClass}">
+          ${statusText}
+        </span>
+        ${filledDays > 0 ? `
+          <button type="button" data-clear-month="${idx}" title="${mname.toUpperCase()} ayı verilerini sil"
+            class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        ` : ''}
+      </div>
     `;
+    const clearBtn = card.querySelector("[data-clear-month]");
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => clearMonthData(idx));
+    }
     monthsGrid.appendChild(card);
   });
 
@@ -299,6 +311,51 @@ function refreshMonthDashboard() {
   }
 
   if (window.lucide) lucide.createIcons();
+}
+
+// Belirli bir ayın verilerini temizler
+async function clearMonthData(monthIdx) {
+  if (!currentWorkbook) return;
+  const mname = MONTH_NAMES[monthIdx];
+  const ws = findWorksheetByMonthNum(currentWorkbook, monthIdx);
+  if (!ws) return;
+
+  const result = await Swal.fire({
+    title: `${mname.toUpperCase()} 2026 Silinsin mi?`,
+    text: `${mname.toUpperCase()} ayına ait yüklenmiş tüm günlük yemek verileri temizlenecektir.`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#ef4444",
+    cancelButtonColor: "#64748b",
+    confirmButtonText: "Evet, Sil",
+    cancelButtonText: "Vazgeç"
+  });
+
+  if (!result.isConfirmed) return;
+
+  const hasExtraCols = ws.getCell('H2').value && normStr(ws.getCell('H2').value).includes('acma');
+  const maxCol = hasExtraCols ? 9 : 7;
+
+  ws.eachRow((row) => {
+    const dt = parseDateSmart(row.getCell(1).value);
+    if (dt) {
+      for (let c = 2; c <= maxCol; c++) {
+        row.getCell(c).value = null;
+      }
+    }
+  });
+
+  const updatedBuffer = await currentWorkbook.xlsx.writeBuffer();
+  await saveWorkbookBuffer(updatedBuffer);
+  refreshMonthDashboard();
+
+  Swal.fire({
+    icon: "success",
+    title: "Temizlendi",
+    text: `${mname.toUpperCase()} 2026 verileri başarıyla silindi.`,
+    timer: 1500,
+    showConfirmButton: false
+  });
 }
 
 // 5. DOSYA YÜKLEME VE son.xlsx İLE OTOMATİK BİRLEŞTİRME
